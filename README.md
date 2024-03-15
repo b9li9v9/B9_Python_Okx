@@ -4,6 +4,7 @@
 
     先配置 UserConfig.py
     然后 所有操作在Fusion.py进行
+    所有操作只和这两个文件有关
     
 
 整体思路:

@@ -1,4 +1,6 @@
-此库是克隆"okx-python-sdk-api-v5"后进行的自用修改
+简介：
+
+    此库是克隆"okx-python-sdk-api-v5"后进行的自用修改
 
 使用:
 

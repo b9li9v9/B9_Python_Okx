@@ -11,4 +11,4 @@ class AQueuePool:
     @classmethod
     async def clearQueue(cls,queue):
         print("WebSocket Clear MessageQueue...")
-        cls.queue = asyncio.Queue()
+        queue = asyncio.Queue()

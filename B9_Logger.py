@@ -8,7 +8,7 @@ class Logger():
     @classmethod
     async def write_log(cls,message):
         times = str(datetime.fromtimestamp(int(time.time())))
-        print(f"{times} {message}")
+        print(f"Logger: {times} {message}")
         async with aiofiles.open(UserConfig.LogFilePath, mode='a',encoding='utf-8') as f:
             message = str(message)
             logtext = times + ' ' + message + '\n'

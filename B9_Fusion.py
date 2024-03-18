@@ -250,21 +250,23 @@ async def handle(uc, priws, data, datatype):
                 print('sell')
                 uc.Tradeing = False
     elif datatype == 'pri':
-        print(data)
+        print(str(datetime.fromtimestamp(int(time.time()))),data)
+    else:
+        raise
 
 
 # 账户初始化
 async def SetAccount(prihc):
     # 该函数用于init账户设置
     try:
-        tasks1 = asyncio.create_task(prihc._request_without_params('GET', f"/api/v5/account/balance"))  # 获取账户中所有、或指定的资产余额
-        tasks2 = asyncio.create_task(prihc._request_without_params('GET', f"/api/v5/account/positions"))  # 查看BTC-USDT的持仓信息
-        tasks3 = asyncio.create_task(prihc._request_without_params('GET', f"/api/v5/account/config"))  # 查看当前账户的配置信息
+        tasks1 = asyncio.create_task(prihc._request_without_params('GET', r"/api/v5/account/balance"))  # 获取账户中所有、或指定的资产余额
+        tasks2 = asyncio.create_task(prihc._request_without_params('GET', r"/api/v5/account/positions"))  # 查看BTC-USDT的持仓信息
+        tasks3 = asyncio.create_task(prihc._request_without_params('GET', r"/api/v5/account/config"))  # 查看当前账户的配置信息
 
-        tasks4 = asyncio.create_task(prihc._request_with_params('POST', f"/api/v5/account/set-position-mode",  # 持仓方式long_short_mode：开平仓模式 net_mode：买卖模式仅适用交割/永续
+        tasks4 = asyncio.create_task(prihc._request_with_params('POST', r"/api/v5/account/set-position-mode",  # 持仓方式long_short_mode：开平仓模式 net_mode：买卖模式仅适用交割/永续
                                                                 {'posMode': 'long_short_mode'}))
 
-        tasks5 = asyncio.create_task(prihc._request_with_params('POST', f"/api/v5/account/set-leverage",  # 持仓杠杆设置
+        tasks5 = asyncio.create_task(prihc._request_with_params('POST', r"/api/v5/account/set-leverage",  # 持仓杠杆设置
                                                                 {
                                                                     "instId": "BTC-USDT-SWAP",
                                                                     "lever": "100",
@@ -279,10 +281,10 @@ async def SetAccount(prihc):
                                                                     "mgnMode": "isolated"
                                                                 }))
 
-        tasks7 = asyncio.create_task(prihc._request_without_params("GET",f"/api/v5/account/max-size?instId=BTC-USDT-SWAP&tdMode=isolated"))  # 最大交易上线量
-        tasks8 = asyncio.create_task(prihc._request_without_params("GET","/api/v5/account/max-avail-size?instId=BTC-USDT-SWAP&tdMode=isolated"))
+        tasks7 = asyncio.create_task(prihc._request_without_params("GET",r"/api/v5/account/max-size?instId=BTC-USDT-SWAP&tdMode=isolated"))  # 最大交易上线量
+        tasks8 = asyncio.create_task(prihc._request_without_params("GET",r"/api/v5/account/max-avail-size?instId=BTC-USDT-SWAP&tdMode=isolated"))
         # 查看BTC-USDT的持仓信息
-        tasks9 = asyncio.create_task(prihc._request_without_params("GET", "/api/v5/account/positions?instId=BTC-USDT-SWAP"))  # 持仓详情
+        tasks9 = asyncio.create_task(prihc._request_without_params("GET", r"/api/v5/account/positions?instId=BTC-USDT-SWAP"))  # 持仓详情
 
         # 并发执行任务
         results = await asyncio.gather(tasks1, tasks2, tasks3, tasks4, tasks5, tasks6, tasks7, tasks8, tasks9)
@@ -305,7 +307,7 @@ async def main():
     # 清空日志
     await Logger.clear_log()
 
-    # 同步 httpx客户端 私
+    #httpx客户端 私
     PriHC = HClient(api_key=UserConfig.apiKey, api_secret_key=UserConfig.secretKey, passphrase=UserConfig.passphrase)
     # 异步 Ws客户端 公、私、业务
     # PubWsC = AWsClient(url=UC.PublicUrl)

@@ -20,7 +20,8 @@ def get_header(api_key, sign, timestamp, passphrase, flag):
     header['OK-ACCESS-SIGN'] = sign
     header['OK-ACCESS-TIMESTAMP'] = str(timestamp)
     header[ 'OK-ACCESS-PASSPHRASE'] = passphrase
-    header['x-simulated-trading'] = flag
+    if flag == '1':
+        header['x-simulated-trading'] = flag
     # print('header: ',header)
     return header
 

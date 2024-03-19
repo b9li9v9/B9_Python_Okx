@@ -22,7 +22,6 @@ def get_header(api_key, sign, timestamp, passphrase, flag):
     header[ 'OK-ACCESS-PASSPHRASE'] = passphrase
     if flag == '1':
         header['x-simulated-trading'] = flag
-    # print('header: ',header)
     return header
 
 

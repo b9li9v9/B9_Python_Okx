@@ -7,7 +7,7 @@ import B9_HttpxUtils, B9_HttpxExceptions
 
 class HClient(object):
 
-    def __init__(self, api_key, api_secret_key, passphrase, use_server_time=False, flag='1'):
+    def __init__(self, api_key, api_secret_key, passphrase, use_server_time=False, flag='1'): # 模拟盘、实盘 改这个flag
 
         self.API_KEY = api_key
         self.API_SECRET_KEY = api_secret_key

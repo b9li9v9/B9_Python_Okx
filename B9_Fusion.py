@@ -319,7 +319,7 @@ async def main():
     BusWsC = AWsClient(url=UserConfig.BusinessUrl)
 
     # 协程任务监控
-    CoroutineHeartbeat_task = asyncio.create_task(CoroutineMonitor.start(10))
+    CoroutineMonitor_task = asyncio.create_task(CoroutineMonitor.start(10))
 
     # 封装任务
     # Public_WsC_task = asyncio.create_task(public_producer(PubWsC,AQueuePool))

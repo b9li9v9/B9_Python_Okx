@@ -3,7 +3,7 @@ import time
 from datetime import datetime
 
 
-class CoroutineHeartbeat:
+class CoroutineMonitor:
     Statu = True
     CorosPool = {}
 

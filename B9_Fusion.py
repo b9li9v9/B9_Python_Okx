@@ -9,7 +9,7 @@ from B9_Logger import Logger
 from B9_AWsClient import AWsClient
 from B9_UserConfig import UserConfig
 from B9_AQueuePool import AQueuePool
-from B9_CoroutineHeartbeat import CoroutineHeartbeat
+from B9_CoroutineHeartbeat import CoroutineMonitor
 
 
 # 公共频道
@@ -319,13 +319,13 @@ async def main():
     BusWsC = AWsClient(url=UserConfig.BusinessUrl)
 
     # 协程任务监控
-    CoroutineHeartbeat_task = asyncio.create_task(CoroutineHeartbeat.start(10))
+    CoroutineHeartbeat_task = asyncio.create_task(CoroutineMonitor.start(10))
 
     # 封装任务
     # Public_WsC_task = asyncio.create_task(public_producer(PubWsC,AQueuePool))
-    Private_WsC_task = asyncio.create_task(private_producer(PriWsC,CoroutineHeartbeat,AQueuePool))
-    Business_WsC_task = asyncio.create_task(business_producer(BusWsC,CoroutineHeartbeat,AQueuePool))
-    Consumer_Handel_task = asyncio.create_task(consumer(UserConfig, PriWsC,CoroutineHeartbeat, AQueuePool))  # 策略区
+    Private_WsC_task = asyncio.create_task(private_producer(PriWsC, CoroutineMonitor, AQueuePool))
+    Business_WsC_task = asyncio.create_task(business_producer(BusWsC, CoroutineMonitor, AQueuePool))
+    Consumer_Handel_task = asyncio.create_task(consumer(UserConfig, PriWsC, CoroutineMonitor, AQueuePool))  # 策略区
     private_timer_task = asyncio.create_task(private_timer(10,PriWsC)) # 私有客户端心跳
 
     # 阻塞 账户初始

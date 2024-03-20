@@ -9,7 +9,7 @@ from B9_Logger import Logger
 from B9_AWsClient import AWsClient
 from B9_UserConfig import UserConfig
 from B9_AQueuePool import AQueuePool
-from B9_CoroutineHeartbeat import CoroutineMonitor
+from B9_CoroutineMonitor import CoroutineMonitor
 
 
 # 公共频道

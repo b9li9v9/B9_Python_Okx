@@ -299,7 +299,7 @@ async def SetAccount(prihc):
 
     finally:
         # 关闭客户端
-        prihc.client.close()
+        await prihc.client.aclose()
 
 
 # 启动函数

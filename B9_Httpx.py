@@ -16,6 +16,7 @@ class HClient(object):
         self.flag = flag
         self.client = httpx.AsyncClient(base_url='https://www.okx.com', http2=True)
 
+
     async def _request(self, method, request_path, params):
         if method == "GET":
             request_path = request_path + B9_HttpxUtils.parse_params_to_str(params)

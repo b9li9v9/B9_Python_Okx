@@ -9,6 +9,7 @@ from B9_Logger import Logger
 from B9_AWsClient import AWsClient
 from B9_UserConfig import UserConfig
 from B9_AQueuePool import AQueuePool
+from B9_CoroutineHeartbeat import CoroutineHeartbeat
 
 
 # 公共频道
@@ -45,7 +46,7 @@ async def public_producer(ws,aqueuepool):
 
 
 # 私有频道
-async def private_producer(ws,aqueuepool):
+async def private_producer(ws,CoroutineHeartbeat,aqueuepool):
 
     Private_BOOM = 0
     aqueuepool.priqueue = asyncio.Queue()
@@ -70,6 +71,7 @@ async def private_producer(ws,aqueuepool):
                     except Exception as e:
                         await Logger.write_log(f"Private ERROR occurred: {e}")
                         break  # 处理异常时跳出循环
+                    CoroutineHeartbeat.Broadcast('private task')
         finally:
             await aqueuepool.clearQueue(aqueuepool.priqueue)  # 清空队列
             await ws.stop()  # 清理退出
@@ -85,7 +87,7 @@ async def private_timer(interval, priws):
 
 
 # 业务频道
-async def business_producer(ws,aqueuepool):
+async def business_producer(ws,CoroutineHeartbeat,aqueuepool):
 
     Business_BOOM = 0
     aqueuepool.busqueue = asyncio.Queue()
@@ -110,6 +112,7 @@ async def business_producer(ws,aqueuepool):
                     except Exception as e:
                         await Logger.write_log(f"Business ERROR occurred: {e}")
                         break  # 处理任何异常时跳出循环
+                    CoroutineHeartbeat.Broadcast('business task')
         finally:
             await aqueuepool.clearQueue(aqueuepool.busqueue)  # 清空队列
             await ws.stop()  # 清理退出
@@ -195,11 +198,12 @@ async def private_clan(uc,priws,aqueuepool):
         await asyncio.sleep(0)
 
 # 消费者
-async def consumer(uc, priws, aqueuepool):
+async def consumer(uc, priws,CoroutineHeartbeat, aqueuepool):
     # 传递给过滤器
     while True:
         await business_clan(uc,priws,aqueuepool)
         await private_clan(uc,priws,aqueuepool)
+        CoroutineHeartbeat.Broadcast('consumer task')
 
 
 # 策略区
@@ -307,19 +311,22 @@ async def main():
     # 清空日志
     await Logger.clear_log()
 
-    #httpx客户端 私
+    # httpx客户端 私
     PriHC = HClient(api_key=UserConfig.apiKey, api_secret_key=UserConfig.secretKey, passphrase=UserConfig.passphrase)
     # 异步 Ws客户端 公、私、业务
     # PubWsC = AWsClient(url=UC.PublicUrl)
     PriWsC = AWsClient(url=UserConfig.PrivateUrl,apiKey=UserConfig.apiKey,passphrase=UserConfig.passphrase,secretKey=UserConfig.secretKey)
     BusWsC = AWsClient(url=UserConfig.BusinessUrl)
 
+    # 协程任务监控
+    CoroutineHeartbeat_task = asyncio.create_task(CoroutineHeartbeat.start(10))
+
     # 封装任务
     # Public_WsC_task = asyncio.create_task(public_producer(PubWsC,AQueuePool))
-    Private_WsC_task = asyncio.create_task(private_producer(PriWsC,AQueuePool))
-    Business_WsC_task = asyncio.create_task(business_producer(BusWsC,AQueuePool))
-    Consumer_Handel_task = asyncio.create_task(consumer(UserConfig, PriWsC, AQueuePool))  # 策略区
-    private_timer_task = asyncio.create_task(private_timer(10,PriWsC)) # 心跳
+    Private_WsC_task = asyncio.create_task(private_producer(PriWsC,CoroutineHeartbeat,AQueuePool))
+    Business_WsC_task = asyncio.create_task(business_producer(BusWsC,CoroutineHeartbeat,AQueuePool))
+    Consumer_Handel_task = asyncio.create_task(consumer(UserConfig, PriWsC,CoroutineHeartbeat, AQueuePool))  # 策略区
+    private_timer_task = asyncio.create_task(private_timer(10,PriWsC)) # 私有客户端心跳
 
     # 阻塞 账户初始
     await SetAccount(PriHC)
@@ -330,6 +337,7 @@ async def main():
     await Business_WsC_task
     await Consumer_Handel_task
     await private_timer_task
+    await CoroutineHeartbeat_task
 
 if __name__ == "__main__":
     asyncio.run(main())

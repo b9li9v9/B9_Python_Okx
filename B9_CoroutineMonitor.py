@@ -8,8 +8,8 @@ class CoroutineMonitor:
 
     # 注册
     @classmethod
-    def register(cls, coros):
-        cls.CorosPool[coros] = False
+    def register(cls, corosName):
+        cls.CorosPool[corosName] = True
 
     # 取消
     @classmethod
@@ -37,7 +37,7 @@ class CoroutineMonitor:
     @classmethod
     def Broadcast(cls, corosName):
         if corosName not in cls.CorosPool:
-            cls.CorosPool[corosName] = True
+            cls.register(corosName)
 
         if cls.CorosPool[corosName]:
             print(f"{datetime.now()} {corosName} 协程正在运行")

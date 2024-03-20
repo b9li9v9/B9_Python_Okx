@@ -46,7 +46,7 @@ async def public_producer(ws,aqueuepool):
 
 
 # 私有频道
-async def private_producer(ws,CoroutineHeartbeat,aqueuepool):
+async def private_producer(ws, CoroutineMonitor, aqueuepool):
 
     Private_BOOM = 0
     aqueuepool.priqueue = asyncio.Queue()
@@ -71,7 +71,7 @@ async def private_producer(ws,CoroutineHeartbeat,aqueuepool):
                     except Exception as e:
                         await Logger.write_log(f"Private ERROR occurred: {e}")
                         break  # 处理异常时跳出循环
-                    CoroutineHeartbeat.Broadcast('private task')
+                    CoroutineMonitor.Broadcast('private task')
         finally:
             await aqueuepool.clearQueue(aqueuepool.priqueue)  # 清空队列
             await ws.stop()  # 清理退出
@@ -87,7 +87,7 @@ async def private_timer(interval, priws):
 
 
 # 业务频道
-async def business_producer(ws,CoroutineHeartbeat,aqueuepool):
+async def business_producer(ws, CoroutineMonitor, aqueuepool):
 
     Business_BOOM = 0
     aqueuepool.busqueue = asyncio.Queue()
@@ -112,7 +112,7 @@ async def business_producer(ws,CoroutineHeartbeat,aqueuepool):
                     except Exception as e:
                         await Logger.write_log(f"Business ERROR occurred: {e}")
                         break  # 处理任何异常时跳出循环
-                    CoroutineHeartbeat.Broadcast('business task')
+                    CoroutineMonitor.Broadcast('business task')
         finally:
             await aqueuepool.clearQueue(aqueuepool.busqueue)  # 清空队列
             await ws.stop()  # 清理退出
@@ -198,12 +198,12 @@ async def private_clan(uc,priws,aqueuepool):
         await asyncio.sleep(0)
 
 # 消费者
-async def consumer(uc, priws,CoroutineHeartbeat, aqueuepool):
+async def consumer(uc, priws, CoroutineMonitor, aqueuepool):
     # 传递给过滤器
     while True:
         await business_clan(uc,priws,aqueuepool)
         await private_clan(uc,priws,aqueuepool)
-        CoroutineHeartbeat.Broadcast('consumer task')
+        CoroutineMonitor.Broadcast('consumer task')
 
 
 # 策略区
@@ -337,7 +337,7 @@ async def main():
     await Business_WsC_task
     await Consumer_Handel_task
     await private_timer_task
-    await CoroutineHeartbeat_task
+    await CoroutineMonitor_task
 
 if __name__ == "__main__":
     asyncio.run(main())

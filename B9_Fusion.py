@@ -71,7 +71,7 @@ async def private_producer(ws, CoroutineMonitor, aqueuepool):
                     except Exception as e:
                         await Logger.write_log(f"Private ERROR occurred: {e}")
                         break  # 处理异常时跳出循环
-                    CoroutineMonitor.Broadcast('private task')
+                    CoroutineMonitor.Broadcast('private task') # 这个要有接收信息才会监控 心跳刚好和这个同速 但这个监控不准
         finally:
             await aqueuepool.clearQueue(aqueuepool.priqueue)  # 清空队列
             await ws.stop()  # 清理退出

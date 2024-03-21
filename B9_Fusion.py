@@ -338,6 +338,8 @@ async def main():
     await Consumer_Handel_task
     await private_timer_task
     await CoroutineMonitor_task
+    # 等价 await asyncio.gather(Business_WsC_task, Private_WsC_task, Consumer_Handel_task,private_timer_task,CoroutineMonitor_task)
+
 
 if __name__ == "__main__":
     asyncio.run(main())
